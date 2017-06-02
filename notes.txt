@@ -1,0 +1,21 @@
+
+
+unzip 2015_ACS_Geography_Files.zip -d geofiles
+cd geofiles
+combine all geo csv files into one: cat g20155*.csv >> all_geo_2015.csv
+add key of stusab+logrecno: awk -F "\"*,\"*" '{print $2 $5}' all_geo_2015.csv > geo_key.csv 
+convert keyfile to lowercase: tr A-Z a-z < geo_key.csv > geo_key_lowercase.csv
+add key back to file: paste -d , geo_key_lowercase.csv all_geo_2015.csv > acs_geo_2015.csv
+move to finished: mv acs_geo_2015.csv ../finished/
+
+https://us-central1-censusbigquery.cloudfunctions.net/bigQueryTest
+https://gcp-royhobbstn.c9users.io/censusbigquery/us-central1/bigQueryTest?field=logrecno
+
+
+join with geo
+
+load into google cloud storage
+gsutil cp *.txt gs://my-bucket
+
+load into bigquery (is there a gsutil for this?)
+bq load [DATASET].[TABLE_NAME] [PATH_TO_SOURCE] [SCHEMA]
