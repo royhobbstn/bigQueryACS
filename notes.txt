@@ -1,15 +1,6 @@
-as script
+
 todo state options
-create (script) schema files
-load to google storage
+
 load into bigquery
 
-https://us-central1-censusbigquery.cloudfunctions.net/bigQueryTest
-https://gcp-royhobbstn.c9users.io/censusbigquery/us-central1/bigQueryTest?field=logrecno
 
-
-load into google cloud storage
-gsutil cp *.txt gs://my-bucket
-
-load into bigquery (is there a gsutil for this?)
-bq load [DATASET].[TABLE_NAME] [PATH_TO_SOURCE] [SCHEMA]
