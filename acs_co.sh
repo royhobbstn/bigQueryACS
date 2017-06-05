@@ -1,17 +1,29 @@
 #!/bin/bash
 
-mkdir acs
-cd acs
+#configure these variables
+databucket=acs1115_stage;
+bigqueryschema=acs1115;
 
-echo "downloading CO all geo not tracts and bgs"
-curl --progress-bar https://www2.census.gov/programs-surveys/acs/summary_file/2015/data/5_year_by_state/Delaware_All_Geographies_Not_Tracts_Block_Groups.zip -O
-echo "downloading CO all tracts and bgs"
-curl --progress-bar https://www2.census.gov/programs-surveys/acs/summary_file/2015/data/5_year_by_state/Delaware_Tracts_Block_Groups_Only.zip -O
+mkdir acs_temp
+cd acs_temp
 
-echo "unzipping CO all geo not tracts and bgs"
-unzip -qq Delaware_All_Geographies_Not_Tracts_Block_Groups.zip -d group1
-echo "unzipping CO all tracts and bgs"
-unzip -qq Delaware_Tracts_Block_Groups_Only.zip -d group2
+declare -A states; states[al]=Alabama; states[ak]=Alaska; states[az]=Arizona; states[ar]=Arkansas; states[ca]=California; states[co]=Colorado; states[ct]=Connecticut; states[de]=Delaware; states[dc]=DistrictOfColumbia; states[fl]=Florida; states[ga]=Georgia; states[hi]=Hawaii; states[id]=Idaho; states[il]=Illinois; states[in]=Indiana; states[ia]=Iowa; states[ks]=Kansas; states[ky]=Kentucky; states[la]=Louisiana; states[me]=Maine; states[md]=Maryland; states[ma]=Massachusetts; states[mi]=Michigan; states[mn]=Minnesota; states[ms]=Mississippi; states[mo]=Missouri; states[mt]=Montana; states[ne]=Nebraska; states[nv]=Nevada; states[nh]=NewHampshire; states[nj]=NewJersey; states[nm]=NewMexico; states[ny]=NewYork; states[nc]=NorthCarolina; states[nd]=NorthDakota; states[oh]=Ohio; states[ok]=Oklahoma; states[or]=Oregon; states[pa]=Pennsylvania; states[pr]=PuertoRico; states[ri]=RhodeIsland; states[sc]=SouthCarolina; states[sd]=SouthDakota; states[tn]=Tennessee; states[tx]=Texas; states[us]=UnitedStates; states[ut]=Utah; states[vt]=Vermont; states[va]=Virginia; states[wa]=Washington; states[wv]=WestVirginia; states[wi]=Wisconsin; states[wy]=Wyoming;
+
+echo Number of arguments: $#
+
+for var in "$@"
+do
+    echo "$var"
+    echo "downloading $var all geo not tracts and bgs"
+    curl --progress-bar https://www2.census.gov/programs-surveys/acs/summary_file/2015/data/5_year_by_state/${states[$var]}_All_Geographies_Not_Tracts_Block_Groups.zip -O
+    echo "downloading $var all tracts and bgs"
+    curl --progress-bar https://www2.census.gov/programs-surveys/acs/summary_file/2015/data/5_year_by_state/${states[$var]}_Tracts_Block_Groups_Only.zip -O
+    echo "unzipping $var all geo not tracts and bgs"
+    unzip -qq ${states[$var]}_All_Geographies_Not_Tracts_Block_Groups.zip -d group1
+    echo "unzipping $var all tracts and bgs"
+    unzip -qq ${states[$var]}_Tracts_Block_Groups_Only.zip -d group2
+done
+
 
 echo "creating temporary directories"
 mkdir staged
@@ -44,6 +56,9 @@ for i in $(seq -f "%03g" 1 122); do cat p_m20155**0"$i"000*.csv >> mseq"$i".csv;
 mv *seq* ../combined/
 
 cd ../combined
+
+echo "replacing suppressed fields with null"
+for file in *.csv; do perl -pi -e 's/\.,/,/g' $file; done;
 
 for file in *.csv; do echo "sorting $file"; sort $file > ../sorted/$file; done;
 
@@ -92,8 +107,8 @@ cd joined
 
 echo "begin loading data to google storage bucket"
 # load into google cloud storage
-# gsutil mb -p censusbigquery gs://acs1115_stage
-gsutil cp *.csv gs://acs1115_stage
+gsutil mb gs://$databucket
+gsutil cp *.csv gs://$databucket
 
 cd ../schemas
 
@@ -101,16 +116,19 @@ cd ../schemas
 echo "begin loading data into bigQuery"
 
 
-# could not parse '.' as double
-
-# don't show google status messages
-# echo file being uploaded
-
 # bq load [DATASET].[TABLE_NAME] [PATH_TO_SOURCE] [SCHEMA]
-bq mk acs1115
+bq mk $bigqueryschema
+
 # load estimate files to bigQuery
-for file in *.txt; do value=`cat $file`; snum=`expr "/$file" : '.*\(.\{3\}\)\.'`; bq load --ignore_unknown_values acs1115.eseq$snum gs://acs1115_stage/eseq$snum.csv $value; done;
+for file in *.txt; do value=`cat $file`; snum=`expr "/$file" : '.*\(.\{3\}\)\.'`; bq load --ignore_unknown_values $bigqueryschema.eseq$snum gs://$databucket/eseq$snum.csv $value; done;
 #load moe files to bigQuery
-for file in *.txt; do value=`cat $file`; snum=`expr "/$file" : '.*\(.\{3\}\)\.'`; bq load --ignore_unknown_values acs1115.mseq$snum gs://acs1115_stage/mseq$snum.csv $value; done;
+for file in *.txt; do value=`cat $file`; snum=`expr "/$file" : '.*\(.\{3\}\)\.'`; bq load --ignore_unknown_values $bigqueryschema.mseq$snum gs://$databucket/mseq$snum.csv $value; done;
+
+
+#cleanup
+echo "cleaning up temp files on hard drive"
+cd ..
+cd ..
+rm -r acs_temp
 
 echo "all done."
