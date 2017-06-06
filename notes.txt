@@ -1,6 +1,0 @@
-
-todo state options
-
-load into bigquery
-
-
