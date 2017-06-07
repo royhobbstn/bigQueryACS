@@ -22,25 +22,46 @@ Other than that, you will need to make sure you have unzip installed (the Google
 
 Grab the script from my Github.
 
-```wget https://raw.githubusercontent.com/royhobbstn/bigQueryACS/master/acs_co.sh```
+```
+wget https://raw.githubusercontent.com/royhobbstn/bigQueryACS/master/acs1115_bq.sh
+```
 
 
 ## Using the Script
 
 Like this for Colorado:
 ```
-bash acs_co.sh co
+bash acs1115_bq.sh co
 ```
 
 More than one State?
 ```
-bash acs_co.sh de co hi
+bash acs1115_bq.sh de co hi
 ```
 
 All the States?  That's the default (will take a very long time, see below)
 ```
-bash acs_co.sh
+bash acs1115_bq.sh
 ```
+
+To avoid the unfortunate situation of the script dying when the terminal unexpectedly disconnects (trust me, it will!), I would advise running larger jobs through [screen](https://www.gnu.org/software/screen/manual/screen.html).
+```
+screen
+bash acs1115_bq.sh
+```
+
+Then press Ctrl-a, followed by 'd' (without the quotes) to go about your normal business.
+
+When you want to check back in, type:
+```
+screen -r
+```
+
+When finished, exit a screen like you would with a normal session:
+```
+exit
+```
+
 
 
 ## Customization
@@ -48,7 +69,7 @@ bash acs_co.sh
 By default, this script will load the data files into a bucket called ```acs1115_stage```.  It will create a BigQuery schema named ```acs1115```.
 To change these defaults, edit the environmental variables at the top of the code block:
 
-```sudo vi acs_co.sh```
+```sudo vi acs1115_bq.sh```
 
 You'll see something like:
 
@@ -84,9 +105,15 @@ n1-standard-1 (1 vCPU, 3.75 GB memory):
 
 # How do I use this data?
 
-TODO: basic GUI query
+Google has a [GUI](https://bigquery.cloud.google.com/queries/) if you have any one-off or exploratory queries you'd like to run.
+```
+TODO SQL Query
+```
 
-You can use BigQuery through APIs written in [many different languages](https://cloud.google.com/bigquery/create-simple-app-api).
+I have purposely denormalized the data for improved query performance.  In the vast majority of cases, you should not need any JOINs in your data.
+
+
+You can use also BigQuery through APIs written in [many different languages](https://cloud.google.com/bigquery/create-simple-app-api).
 Here's some boilerplate NodeJS: [example.js](example.js)
 
 

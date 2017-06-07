@@ -4,6 +4,12 @@
 databucket=acs1115_stage;
 bigqueryschema=acs1115;
 
+dir=$(pwd)
+LOG_FILE="$dir/acs1115_logfile.txt"
+exec > >(tee -a ${LOG_FILE} )
+exec 2> >(tee -a ${LOG_FILE} >&2)
+
+
 starttime="start: `date +"%T"`"
 
 mkdir acs_temp_cproj
@@ -34,6 +40,7 @@ do
     unzip -qq ${states[$var]}_Tracts_Block_Groups_Only.zip -d group2
 done
 
+
 echo "creating temporary directories"
 mkdir staged
 mkdir combined
@@ -56,6 +63,7 @@ cd ../group2
 for file in *20155**0***000.txt ; do mv $file ${file//.txt/b.csv} ; done
 for i in *20155**0***000*.csv; do echo "writing p_$i"; while IFS=, read f1 f2 f3 f4 f5 f6; do echo "$f3$f6,"; done < $i > p_$i; done
 mv p_* ../staged/
+
 
 cd ../staged
 echo "combining tract and bg files with all other geographies: estimates"
