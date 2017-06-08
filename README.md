@@ -6,12 +6,13 @@ Automate loading of American Community Survey data into Google BigQuery
 
 I VERY highly recommend running this from a Google Compute Instance for performance reasons.
 
-If you insist on running this elsewhere, you will need to have the gsutil and bq tools pre-installed.  You can get them by installing the Google Cloud SDK on the machine you wish to run the bigQueryACS script from.
-I haven't tested on anything other than Debian, so your mileage may vary on other OS's.
+Make sure to check the box that says:
+*ALLOW FULL ACCESS TO ALL CLOUD APIs*
 
+If you plan on loading the entire ACS, allocate an Instance with **325GB**.  
 
-If you plan on loading the entire ACS, allocate an Instance with *300GB*.  Also make sure to check the box that says *'ALLOW FULL ACCESS TO ALL CLOUD APIs'*.
-
+If you insist on running this elsewhere, you will need to have the **gsutil** and **bq** tools pre-installed.  You can get them by installing the [Google Cloud SDK](https://cloud.google.com/sdk/downloads) on the machine you wish to run the bigQueryACS script from.
+I haven't tested on anything other than Google Compute Engine Debian and Ubuntu 16.04, so your mileage may vary on other OS's.
 
 Other than that, you will need to make sure you have unzip installed (the Google Compute instances I've tested with did not have it.)
 
@@ -44,7 +45,7 @@ All the States?  That's the default (will take a very long time, see below)
 bash acs1115_bq.sh
 ```
 
-To avoid the unfortunate situation of the script dying when the terminal unexpectedly disconnects (trust me, it will!), I would advise running larger jobs through [screen](https://www.gnu.org/software/screen/manual/screen.html).
+**Warning:** To avoid the unfortunate situation of the script dying when the terminal unexpectedly disconnects (trust me, it will!), I would advise running larger jobs through [screen](https://kb.iu.edu/d/acuy).
 ```
 screen
 bash acs1115_bq.sh
@@ -93,33 +94,40 @@ These were not made to brag about how fast the script is (it's not!).  Rather, i
 
 f1-micro (SharedCPU, 0.6GB): *23min 04sec*
 
-n1-standard-4 (4CPU, 15GB): *23min 07sec*
+n1-standard-1 (1 vCPU, 3.75 GB memory): **
 
-...hmmm the bottleneck appears to be the network.
+n1-standard-4 (4 vCPUs, 15 GB memory): **
+
+...hmmm??
 
 
-*All US States with Debian GNU/Linux 8 (jessie) and 300GB SSD:*
+*All US States with Debian GNU/Linux 8 (jessie) and 300GB Standard Disk:*
 
-n1-standard-1 (1 vCPU, 3.75 GB memory): 
+n1-standard-1 (1 vCPU, 3.75 GB memory): *13hr 10min 54sec*
 
 
 # How do I use this data?
 
 Google has a [GUI](https://bigquery.cloud.google.com/queries/) if you have any one-off or exploratory queries you'd like to run.
+
+Here's an example query for finding the Median Household Income for all counties in Colorado.
+
 ```
-TODO SQL Query
+select NAME, B19013_001 from acs1115.eseq059 where STATE = '08' and SUMLEVEL = '050' order by NAME asc;
 ```
 
-I have purposely denormalized the data for improved query performance.  In the vast majority of cases, you should not need any JOINs in your data.
+As you may have noticed from the above query, I have purposely [denormalized](https://cloud.google.com/bigquery/preparing-data-for-loading) the data for improved query performance.  In the vast majority of cases, you should not need any JOINs in your data.
 
 
 You can use also BigQuery through APIs written in [many different languages](https://cloud.google.com/bigquery/create-simple-app-api).
-Here's some boilerplate NodeJS: [example.js](example.js)
+Here's some boilerplate NodeJS: [example.js](example.js).  It was created for a serverless function, but the format is such that it can be nearly cut and pasted into an existing ExpressJS application without much hassle.
 
 
 # Sequence Number Tables?
 
-Yeah, I know.  But the good thing about having the data already in BigQuery is that it's fairly easy to create individual table files.
+Yeah, I know.  It's a pain to have to look up not only the field that corresponds to the statistic that you're looking for, but also the sequence table.  [Here's a document that can help.](https://www2.census.gov/programs-surveys/acs/summary_file/2015/documentation/user_tools/ACS_5yr_Seq_Table_Number_Lookup.xls)  
+
+However, the good thing about having the data already in BigQuery is that it's fairly easy to create individual table files.
 
 TODO: SQL to convert Seq Tables into logical tables.
 
@@ -129,4 +137,4 @@ TODO: SQL to convert Seq Tables into logical tables.
 If it looks like I've never written a bash script before in my life, it's because I haven't.
 I'd be interested in any help I can get to make this faster or improve platform compatibility.  Any advice on bash script best practices are also welcome.
 
-In all honestly the script should probably be re-written in a language that can take more easily take advantage of multithreading and async io. (in due time)
+In all honestly the script should probably be re-written in a language that can more easily take advantage of multithreading and async io. (in due time).  The largest chunk of time is spent loading data into bigQuery, which is needlessly being done synchronously.  This looks solvable in the [docs](https://cloud.google.com/bigquery/bq-command-line-tool).
