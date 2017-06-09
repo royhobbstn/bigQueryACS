@@ -90,20 +90,15 @@ Then [exit VIM](https://stackoverflow.blog/2017/05/23/stack-overflow-helping-one
 
 These were not made to brag about how fast the script is (it's not!).  Rather, it should give you an idea of how long you can expect to wait for processing to complete.
 
-*Using Delaware as a sample State with Debian GNU/Linux 8 (jessie) and 20GB SSD:*
+*Using Delaware as a sample State with Debian GNU/Linux 8 (jessie) and 20GB Standard Disk:*
 
-f1-micro (SharedCPU, 0.6GB): *23min 04sec*
+n1-standard-1 (1 vCPU, 3.75 GB memory): *17min 27sec*
+n1-highmem-8 (8 vCPUs, 52 GB memory): *17min 11sec*
+
+*All US States with Debian GNU/Linux 8 (jessie) and 325GB Standard Disk:*
 
 n1-standard-1 (1 vCPU, 3.75 GB memory): **
-
-n1-standard-4 (4 vCPUs, 15 GB memory): **
-
-...hmmm??
-
-
-*All US States with Debian GNU/Linux 8 (jessie) and 300GB Standard Disk:*
-
-n1-standard-1 (1 vCPU, 3.75 GB memory): *13hr 10min 54sec*
+n1-highmem-8 (8 vCPUs, 52 GB memory): *5hr 48min 46sec*
 
 
 # How do I use this data?
@@ -119,7 +114,7 @@ select NAME, B19013_001 from acs1115.eseq059 where STATE = '08' and SUMLEVEL = '
 As you may have noticed from the above query, I have purposely [denormalized](https://cloud.google.com/bigquery/preparing-data-for-loading) the data for improved query performance.  In the vast majority of cases, you should not need any JOINs in your data.
 
 
-You can use also BigQuery through APIs written in [many different languages](https://cloud.google.com/bigquery/create-simple-app-api).
+You can also use BigQuery through APIs written in [many different languages](https://cloud.google.com/bigquery/create-simple-app-api).
 Here's some boilerplate NodeJS: [example.js](example.js).  It was created for a serverless function, but the format is such that it can be nearly cut and pasted into an existing ExpressJS application without much hassle.
 
 
@@ -136,5 +131,3 @@ TODO: SQL to convert Seq Tables into logical tables.
 
 If it looks like I've never written a bash script before in my life, it's because I haven't.
 I'd be interested in any help I can get to make this faster or improve platform compatibility.  Any advice on bash script best practices are also welcome.
-
-In all honestly the script should probably be re-written in a language that can more easily take advantage of multithreading and async io. (in due time).  The largest chunk of time is spent loading data into bigQuery, which is needlessly being done synchronously.  This looks solvable in the [docs](https://cloud.google.com/bigquery/bq-command-line-tool).
