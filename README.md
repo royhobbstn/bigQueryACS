@@ -97,9 +97,10 @@ n1-highmem-8 (8 vCPUs, 52 GB memory): *17min 11sec*
 
 *All US States with Debian GNU/Linux 8 (jessie) and 325GB Standard Disk:*
 
-n1-standard-1 (1 vCPU, 3.75 GB memory): **
+n1-standard-1 (1 vCPU, 3.75 GB memory): *5hr 4min 7sec*
 n1-highmem-8 (8 vCPUs, 52 GB memory): *5hr 48min 46sec*
 
+... your call.  The limiting factor appears to be the network.
 
 # How do I use this data?
 
