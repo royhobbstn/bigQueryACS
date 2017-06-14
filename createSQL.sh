@@ -38,7 +38,7 @@ cd schemas
 
 for file in *.txt; do echo ",${file:0:7};\"" > _${file:0:-4}.csv; done
 
-for file in *.csv; do sed -i -e 's/,/ FROM acs1115\./g' $file; done
+for file in *.csv; do sed -i -e "s/,/ FROM $currentbigqueryschema\./g" $file; done
 
 echo "writing lookup columns"
 
@@ -68,23 +68,23 @@ for i in $(seq -f "%03g" 246 490); do echo -n ",b.B$j_$i as B$j_$i" >> ../sql/mB
 for i in $(seq -f "%03g" 491 526); do echo -n ",c.B$j_$i as B$j_$i" >> ../sql/mB$j.sql; done;
 done;
 
-echo -n " FROM [acs1115.eseq085] a JOIN [acs1115.eseq086] b ON a.KEY = b.KEY JOIN [acs1115.eseq087] c ON a.KEY = c.KEY;\"" >> ../sql/eB24121.sql;
-echo -n " FROM [acs1115.mseq085] a JOIN [acs1115.mseq086] b ON a.KEY = b.KEY JOIN [acs1115.mseq087] c ON a.KEY = c.KEY;\"" >> ../sql/mB24121.sql;
+echo -n " FROM [$currentbigqueryschema.eseq085] a JOIN [$currentbigqueryschema.eseq086] b ON a.KEY = b.KEY JOIN [$currentbigqueryschema.eseq087] c ON a.KEY = c.KEY;\"" >> ../sql/eB24121.sql;
+echo -n " FROM [$currentbigqueryschema.mseq085] a JOIN [$currentbigqueryschema.mseq086] b ON a.KEY = b.KEY JOIN [$currentbigqueryschema.mseq087] c ON a.KEY = c.KEY;\"" >> ../sql/mB24121.sql;
 
-echo -n " FROM [acs1115.eseq088] a JOIN [acs1115.eseq089] b ON a.KEY = b.KEY JOIN [acs1115.eseq090] c ON a.KEY = c.KEY;\"" >> ../sql/eB24122.sql;
-echo -n " FROM [acs1115.mseq088] a JOIN [acs1115.mseq089] b ON a.KEY = b.KEY JOIN [acs1115.mseq090] c ON a.KEY = c.KEY;\"" >> ../sql/mB24122.sql;
+echo -n " FROM [$currentbigqueryschema.eseq088] a JOIN [$currentbigqueryschema.eseq089] b ON a.KEY = b.KEY JOIN [$currentbigqueryschema.eseq090] c ON a.KEY = c.KEY;\"" >> ../sql/eB24122.sql;
+echo -n " FROM [$currentbigqueryschema.mseq088] a JOIN [$currentbigqueryschema.mseq089] b ON a.KEY = b.KEY JOIN [$currentbigqueryschema.mseq090] c ON a.KEY = c.KEY;\"" >> ../sql/mB24122.sql;
 
-echo -n " FROM [acs1115.eseq091] a JOIN [acs1115.eseq092] b ON a.KEY = b.KEY JOIN [acs1115.eseq093] c ON a.KEY = c.KEY;\"" >> ../sql/eB24123.sql;
-echo -n " FROM [acs1115.mseq091] a JOIN [acs1115.mseq092] b ON a.KEY = b.KEY JOIN [acs1115.mseq093] c ON a.KEY = c.KEY;\"" >> ../sql/mB24123.sql;
+echo -n " FROM [$currentbigqueryschema.eseq091] a JOIN [$currentbigqueryschema.eseq092] b ON a.KEY = b.KEY JOIN [$currentbigqueryschema.eseq093] c ON a.KEY = c.KEY;\"" >> ../sql/eB24123.sql;
+echo -n " FROM [$currentbigqueryschema.mseq091] a JOIN [$currentbigqueryschema.mseq092] b ON a.KEY = b.KEY JOIN [$currentbigqueryschema.mseq093] c ON a.KEY = c.KEY;\"" >> ../sql/mB24123.sql;
 
-echo -n " FROM [acs1115.eseq094] a JOIN [acs1115.eseq095] b ON a.KEY = b.KEY JOIN [acs1115.eseq096] c ON a.KEY = c.KEY;\"" >> ../sql/eB24124.sql;
-echo -n " FROM [acs1115.mseq094] a JOIN [acs1115.mseq095] b ON a.KEY = b.KEY JOIN [acs1115.mseq096] c ON a.KEY = c.KEY;\"" >> ../sql/mB24124.sql;
+echo -n " FROM [$currentbigqueryschema.eseq094] a JOIN [$currentbigqueryschema.eseq095] b ON a.KEY = b.KEY JOIN [$currentbigqueryschema.eseq096] c ON a.KEY = c.KEY;\"" >> ../sql/eB24124.sql;
+echo -n " FROM [$currentbigqueryschema.mseq094] a JOIN [$currentbigqueryschema.mseq095] b ON a.KEY = b.KEY JOIN [$currentbigqueryschema.mseq096] c ON a.KEY = c.KEY;\"" >> ../sql/mB24124.sql;
 
-echo -n " FROM [acs1115.eseq097] a JOIN [acs1115.eseq098] b ON a.KEY = b.KEY JOIN [acs1115.eseq099] c ON a.KEY = c.KEY;\"" >> ../sql/eB24125.sql;
-echo -n " FROM [acs1115.mseq097] a JOIN [acs1115.mseq098] b ON a.KEY = b.KEY JOIN [acs1115.mseq099] c ON a.KEY = c.KEY;\"" >> ../sql/mB24125.sql;
+echo -n " FROM [$currentbigqueryschema.eseq097] a JOIN [$currentbigqueryschema.eseq098] b ON a.KEY = b.KEY JOIN [$currentbigqueryschema.eseq099] c ON a.KEY = c.KEY;\"" >> ../sql/eB24125.sql;
+echo -n " FROM [$currentbigqueryschema.mseq097] a JOIN [$currentbigqueryschema.mseq098] b ON a.KEY = b.KEY JOIN [$currentbigqueryschema.mseq099] c ON a.KEY = c.KEY;\"" >> ../sql/mB24125.sql;
 
-echo -n " FROM [acs1115.eseq100] a JOIN [acs1115.eseq101] b ON a.KEY = b.KEY JOIN [acs1115.eseq102] c ON a.KEY = c.KEY;\"" >> ../sql/eB24126.sql;
-echo -n " FROM [acs1115.mseq100] a JOIN [acs1115.mseq101] b ON a.KEY = b.KEY JOIN [acs1115.mseq102] c ON a.KEY = c.KEY;\"" >> ../sql/mB24126.sql;
+echo -n " FROM [$currentbigqueryschema.eseq100] a JOIN [$currentbigqueryschema.eseq101] b ON a.KEY = b.KEY JOIN [$currentbigqueryschema.eseq102] c ON a.KEY = c.KEY;\"" >> ../sql/eB24126.sql;
+echo -n " FROM [$currentbigqueryschema.mseq100] a JOIN [$currentbigqueryschema.mseq101] b ON a.KEY = b.KEY JOIN [$currentbigqueryschema.mseq102] c ON a.KEY = c.KEY;\"" >> ../sql/mB24126.sql;
 
 cd ../sql
 
