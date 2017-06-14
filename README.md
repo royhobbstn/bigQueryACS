@@ -4,7 +4,7 @@ Automate loading of American Community Survey data into Google BigQuery
 
 ## Prerequisites:
 
-I VERY highly recommend running this from a Google Compute Instance for performance reasons.
+I VERY highly recommend running this from a Google Compute Instance for performance and simplicity.
 
 Make sure to check the box that says:
 *ALLOW FULL ACCESS TO ALL CLOUD APIs*
@@ -86,7 +86,7 @@ Then [exit VIM](https://stackoverflow.blog/2017/05/23/stack-overflow-helping-one
 
 
 
-# Benchmarks
+## Benchmarks
 
 These were not made to brag about how fast the script is (it's not!).  Rather, it should give you an idea of how long you can expect to wait for processing to complete.
 
@@ -96,13 +96,17 @@ n1-standard-1 (1 vCPU, 3.75 GB memory): *10min 55sec*
 
 *All US States with Debian GNU/Linux 8 (jessie) and 325GB Standard Disk:*
 
-n1-standard-1 (1 vCPU, 3.75 GB memory): *5hr 4min 7sec*
+n1-standard-1 (1 vCPU, 3.75 GB memory):
 
-I've run the tool on more powerful instances with very minimal improvement in processing time.  The limiting factor appears to be the network.
+*5hr 4min 7sec*
+
+*7hrs 5min 21sec*
+
+I've run the tool on more powerful instances with very minimal improvement in processing time.  The limiting factor appears to be network speeds.
 
 Please note that even when the script tool has stopped running, Google may still be processing your data.
 
-# How do I use this data?
+## How do I use this data?
 
 Google has a [GUI](https://bigquery.cloud.google.com/queries/) if you have any one-off or exploratory queries you'd like to run.
 
@@ -119,16 +123,56 @@ You can also use BigQuery through APIs written in [many different languages](htt
 Here's some boilerplate NodeJS: [example.js](example.js).  It was created for a serverless function, but the format is such that it can be nearly cut and pasted into an existing ExpressJS application without much hassle.
 
 
-# Sequence Number Tables?
+## Sequence Number Tables?
 
-Yeah, I know.  It's a pain to have to look up not only the field that corresponds to the statistic that you're looking for, but also the sequence table.  [Here's a document that can help.](https://www2.census.gov/programs-surveys/acs/summary_file/2015/documentation/user_tools/ACS_5yr_Seq_Table_Number_Lookup.xls)  
+Yeah, I know.  It's a pain to have to look up not only the field that corresponds to the statistic that you're looking for, but also the sequence table.  [Here's a document that can help.](https://www2.census.gov/programs-surveys/acs/summary_file/2015/documentation/user_tools/ACS_5yr_Seq_Table_Number_Lookup.xls) 
+If you don't want to go through the pain of looking up sequence numbers, good news!  I have another script for that.  It turns all of those sequence tables into logical census tables.
 
-However, the good thing about having the data already in BigQuery is that it's fairly easy to create individual table files.
+```
+wget https://raw.githubusercontent.com/royhobbstn/bigQueryACS/master/createSQL.sh
+```
 
-TODO: SQL to convert Seq Tables into logical tables.
+If you used a non-default bigQuery schema name, you'll need to edit the configuration variables at the top of the file:
+
+```sudo vi createSQL.sh```
+
+You'll see something like:
+
+```
+#configure these variables
+currentbigqueryschema=acs1115;
+bigquerytableschema=acs1115tables;
+```
+
+```currentbigqueryschema```` is where your bigQuery sequence tables are currently located.
+```bigquerytableschema``` is a new schema where you want the table files to end up.
 
 
-## Note: I'm probably doing it wrong
+### This will not be quick either
+
+
+*Using Delaware as a sample State with Debian GNU/Linux 8 (jessie) and 20GB Standard Disk:*
+
+n1-standard-1 (1 vCPU, 3.75 GB memory): *1hr 6min 14sec*
+
+*All US States with Debian GNU/Linux 8 (jessie) and 325GB Standard Disk:*
+
+
+We're essentially making a couple thousand asynchronous 'CREATE TABLE' queries, but we're firing them off in order instead of all at once.  (There must be a better way... someone?)
+
+
+### Using Table Data
+
+When all is said and done, your new [GUI](https://bigquery.cloud.google.com/queries/) query will look like this:
+
+
+```
+select NAME, B19013_001 from acs1115tables.eB19013 where STATE = '08' and SUMLEVEL = '050' order by NAME asc;
+```
+
+
+
+# Note: This can be improved             
 
 If it looks like I've never written a bash script before in my life, it's because I haven't.
 I'd be interested in any help I can get to make this faster or improve platform compatibility.  Any advice on bash script best practices are also welcome.
