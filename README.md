@@ -144,8 +144,16 @@ currentbigqueryschema=acs1115;
 bigquerytableschema=acs1115tables;
 ```
 
-```currentbigqueryschema```` is where your bigQuery sequence tables are currently located.
+```currentbigqueryschema``` is where your bigQuery sequence tables are currently located.
+
 ```bigquerytableschema``` is a new schema where you want the table files to end up.
+
+
+You can run the query as a bash script:
+
+```
+bash createSQL.sh
+```
 
 
 ### This will not be quick either

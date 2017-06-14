@@ -60,11 +60,11 @@ echo "creating special case tables B24121 to B24126"
 
 
 for j in $(seq 24121 24126); do
-echo -n "bq query --nosync --job_id=eB$j$unique --destination_table=$bigquerytableschema.eB$j \"$basestr" > ../sql/eB$j.sql;
+echo -n "bq query --maximum_billing_tier 2 --nosync --job_id=eB$j$unique --destination_table=$bigquerytableschema.eB$j \"$basestr" > ../sql/eB$j.sql;
 for i in $(seq -f "%03g" 1 245); do echo -n ",a.B$j""_""$i as B$j""_""$i" >> ../sql/eB$j.sql; done;
 for i in $(seq -f "%03g" 246 490); do echo -n ",b.B$j""_""$i as B$j""_""$i" >> ../sql/eB$j.sql; done;
 for i in $(seq -f "%03g" 491 526); do echo -n ",c.B$j""_""$i as B$j""_""$i" >> ../sql/eB$j.sql; done;
-echo -n "bq query --nosync --job_id=mB$j$unique --destination_table=$bigquerytableschema.mB$j \"$basestr" > ../sql/mB$j.sql;
+echo -n "bq query --maximum_billing_tier 2 --nosync --job_id=mB$j$unique --destination_table=$bigquerytableschema.mB$j \"$basestr" > ../sql/mB$j.sql;
 for i in $(seq -f "%03g" 1 245); do echo -n ",a.B$j""_""$i as B$j""_""$i" >> ../sql/mB$j.sql; done;
 for i in $(seq -f "%03g" 246 490); do echo -n ",b.B$j""_""$i as B$j""_""$i" >> ../sql/mB$j.sql; done;
 for i in $(seq -f "%03g" 491 526); do echo -n ",c.B$j""_""$i as B$j""_""$i" >> ../sql/mB$j.sql; done;
