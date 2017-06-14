@@ -42,6 +42,9 @@ for file in *.csv; do sed -i -e "s/,/ FROM $currentbigqueryschema\./g" $file; do
 
 echo "writing lookup columns"
 
+
+unique=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1);
+
 for file in *.txt; do sed -i "1s;^;bq query --nosync --job_id=${file:0:1}${file:7:-4}$unique --destination_table=$bigquerytableschema.${file:0:1}${file:7:-4} \"SELECT KEY,FILEID,STUSAB,SUMLEVEL,COMPONENT,LOGRECNO,US,REGION,DIVISION,STATECE,STATE,COUNTY,COUSUB,PLACE,TRACT,BLKGRP,CONCIT,AIANHH,AIANHHFP,AIHHTLI,AITSCE,AITS,ANRC,CBSA,CSA,METDIV,MACC,MEMI,NECTA,CNECTA,NECTADIV,UA,BLANK1,CDCURR,SLDU,SLDL,BLANK2,BLANK3,ZCTA5,SUBMCD,SDELM,SDSEC,SDUNI,UR,PCI,BLANK4,BLANK5,PUMA5,BLANK6,GEOID,NAME,BTTR,BTBG,BLANK7;" $file; done;
 
 mkdir ../sql
@@ -55,7 +58,6 @@ for file in *.txt; do cat $file "_$file_${file:0:-4}.csv" > "../sql/${file:0:1}$
 
 echo "creating special case tables B24121 to B24126"
 
-unique=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1);
 
 for j in $(seq 24121 24126); do
 echo -n "bq query --nosync --job_id=eB$seq$unique --destination_table=$bigquerytableschema.e$j \"$basestr" > ../sql/eB$j.sql;
