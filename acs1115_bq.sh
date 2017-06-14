@@ -133,7 +133,6 @@ cd ../schemas
 echo "begin loading data into bigQuery"
 
 
-# bq load [DATASET].[TABLE_NAME] [PATH_TO_SOURCE] [SCHEMA]
 bq mk $bigqueryschema
 
 unique=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1);
@@ -144,8 +143,8 @@ for file in *.txt; do value=`cat $file`; snum=`expr "/$file" : '.*\(.\{3\}\)\.'`
 for file in *.txt; do value=`cat $file`; snum=`expr "/$file" : '.*\(.\{3\}\)\.'`; bq --nosync --job_id=mseq$snum$unique load --ignore_unknown_values $bigqueryschema.mseq$snum gs://$databucket/mseq$snum.csv $value; done;
 
 # wait for files to process
-for file in *.txt; do value=`cat $file`; snum=`expr "/$file" : '.*\(.\{3\}\)\.'`; bq wait eseq$snum$unique; done;
-for file in *.txt; do value=`cat $file`; snum=`expr "/$file" : '.*\(.\{3\}\)\.'`; bq wait mseq$snum$unique; done;
+# for file in *.txt; do value=`cat $file`; snum=`expr "/$file" : '.*\(.\{3\}\)\.'`; bq wait eseq$snum$unique; done;
+# for file in *.txt; do value=`cat $file`; snum=`expr "/$file" : '.*\(.\{3\}\)\.'`; bq wait mseq$snum$unique; done;
 
 
 #cleanup
