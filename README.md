@@ -165,6 +165,7 @@ n1-standard-1 (1 vCPU, 3.75 GB memory): *1hr 6min 14sec*
 
 *All US States with Debian GNU/Linux 8 (jessie) and 325GB Standard Disk:*
 
+n1-standard-1 (1 vCPU, 3.75 GB memory): *1hr 7min 17sec*
 
 We're essentially making a couple thousand asynchronous 'CREATE TABLE' queries, but we're firing them off in order instead of all at once.  (There must be a better way... someone?)
 
